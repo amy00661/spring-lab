@@ -42,13 +42,13 @@ public class LoginController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 生成 JWT
+        // 生成 JWT（改：帶入 authentication 以包含使用者名稱/權限）
         String token = jwtTokenProvider.generateToken(authentication);
 
         Map<String, Object> response = new HashMap<>();
         response.put("username", request.getUsername());
         response.put("token", token);
-
+        response.put("tokenType", "Bearer");
         return ResponseEntity.ok(response);
     }
 }

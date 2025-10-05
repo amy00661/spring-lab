@@ -2,7 +2,6 @@ package com.example.springlab.controller;
 
 import com.example.springlab.component.JwtTokenProvider;
 import com.example.springlab.controller.request.LoginRequest;
-import com.example.springlab.model.UserEntity;
 import com.example.springlab.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -22,31 +20,25 @@ public class LoginController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
 
     public LoginController(AuthenticationManager authenticationManager,
-                           JwtTokenProvider jwtTokenProvider,
-                           UserService userService) {
+                           JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
     }
 
-    @Operation(summary = "登入")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        // 驗證帳號密碼
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 生成 JWT
         String token = jwtTokenProvider.generateToken(authentication);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("username", request.getUsername());
+        response.put("username", authentication.getName());
         response.put("token", token);
 
         return ResponseEntity.ok(response);
